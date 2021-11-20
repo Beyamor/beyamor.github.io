@@ -1,0 +1,43 @@
+<html><head><meta charset="utf-8" /><title>Defignition</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">Defignition</h1><h2 class="date">Dec 01, 2014</h2><div id="content"><html><head></head><body><p>The physical universe is a crystalline wonder; a rigid lattice of the natural constants scribbled down on a physics cheat sheet. Gravity on the earth's surface is always going to be 9.80665m/s<sup>2.</sup> Maybe 9.9m/s<sup>2</sup> in the winter; we all pack on a little holiday weight.</p><p>A video game's universe is altogether more <em>squidgy</em>; constants are only constant until they're inconvenient.</p><p>It can take a lot of fiddling to get these constant definitions <em>just right</em>. You're going to waste a lot of time if you have to quit out of the game, hop back to the text editor, nudge a value, maybe recompile, launch the game, and get back to wherever you were just to find out that 2 should've been a 3.</p><p>Interactive development is always, always, <em>always</em> better. It's the difference between reading about snowboarding and actually throwing yourself down a hill. A book's never going to teach you how much time you're gunna spend falling down.</p><p>Ideally, we have a tool for tweaking those values while the game is running. Let me drop some hippie wisdom here: this isn't a science; we need to get a <em>feel</em> for what those definitions mean. </p><p>Turns out, JavaScript makes this pretty easy. Dang, alright.</p><h1>Look Out For The Lookup</h1>Any time you're thinking about runtime-adjustable values, you probably want some sort of global key-value table. Instead of hardcoding values wherever, you stuff 'em in the table. This makes them easy to access and means you don't have to go hunting through the entire codebase to figure out where these values are living.<p>In <a href="https://github.com/Beyamor/jinn">Jinn</a>, these definitions are attached to the global <code>app</code> object:</p><pre><code class="language-coffeescript">app = {
+	definitions: {}
+
+	define: (definitions) -&gt;
+		for k, v of definitions
+			@definitions[k] = v
+}</code></pre><p>The <code>definitions</code> object is just a plain old JavaScript object. We can define things by attaching properties to that object. <code>define</code> takes a bunch of key/values (another JavaScript object) and sticks 'em on the <code>definitions</code>. Super simple.</p><p>Anyway, we can then define a bunch of things:</p><pre><code class="language-coffeescript">app.define
+	PLAYER_GRAB_OFFSET:		30
+	PLAYER_GRAVITY:			40
+	NORMAL_REFUEL_RATE:		40
+	PLAYER_SPEED:			300
+	FUEL_CONSUMPTION_RATE:	100
+	MAX_FLY_SPEED:			600
+	FLY_ACCELERATION:		400
+	MAX_FUEL:				20
+	PLAYER_JUMP:			550</code></pre><p>And so now, we can reference defined values at runtime:</p><pre><code class="language-coffeescript">defs = app.definitions
+@player.vel.y += defs.PLAYER_GRAVITY</code></pre><p>Now, that's all fine or whatever, but the benefit isn't immediately obvious. Sure, things are maybe organized a little better since definitions aren't just floating around, but really, big whoop.</p><p>Things get a little cooler when you realize that we can build things on top of the definitions table. Things like, well, our tweaker.</p><h1>Tweak It Till You Make It</h1>So, we've got our definitions - a bunch of key/values in the form of properties on a JavaScript object. There's two important things here:<ul><li>JavaScript objects like to be inspected, so much so that you can dynamically iterate over their properties.</li><li>We're swimming in a sea of HTML and CSS.</li></ul><p>It should be pretty obvious how our tweaker is going to work. We'll just build an HTML interface that lets us poke and prod at our definitions. </p><p>For every key/value pair on the definitions object, we'll add a textfield to the tweaker. We'll hook that textfield up such that when it's contents change, the definition is, uh, redefined. So, for each definition, we get something like this:</p><pre><code class="language-coffeescript">valueEl = $ &quot;&lt;input type=\&quot;text\&quot; value=\&quot;#{value}\&quot;&gt;&quot;
+valueEl.change -&gt;
+	value = app.definitions[name].constructor(
+		valueEl.val()
+	)
+	app.definitions[name] = value</code></pre><p>Now, there's something cool happening here. We don't actually know what type the definition values are - they could be numbers, they could be strings. However, in JavaScript, we can easily get something's constructor. If it's a number or a string, that constructor'll be pretty good about coercing any value into the right type:</p><pre><code class="language-coffeescript">1.constructor(&quot;2&quot;) # 2 - a number!
+&quot;1&quot;.constructor(2) # &quot;2&quot; - a string!</code></pre><p>So, without even working for it, we get a handy means of converting an HTML element's value to the type of the existing definition. That's pretty legit.</p><p>Anyway, at this point, it's pretty much child's play to iterate over every definition and add it to the tweaker:</p><pre><code class="language-coffee">el =
+	$(&quot;&lt;div id=#{ID}&gt;&quot;)
+		.draggable()
+
+for name, value of app.definitions
+	do (name, value) -&gt;
+		definitionEl =
+			$(&quot;&lt;div class=\&quot;definition\&quot;&gt;&quot;)
+				.text(&quot;#{name}: &quot;)
+
+		valueEl =
+			$ &quot;&lt;input type=\&quot;text\&quot; value=\&quot;#{value}\&quot;&gt;&quot;
+
+		valueEl.change -&gt;
+			value = app.definitions[name].constructor valueEl.val()
+			app.definitions[name] = value
+
+		definitionEl.append valueEl
+		el.append definitionEl
+
+$('body').append el</code></pre><p>That's, like, twenty lines of code. With it, we get this cool little runtime editor:</p><p><img alt="tweaker" src="http://i.imgur.com/Hea7Gyn.png" /></p><p>Now we can tweak to our hearts' content. JavaScript's support for dynamic goings-on as well as its ability to manipulate the DOM lets us quickly and easily build a tool integrated with the heart of the game engine. That's really rad.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>

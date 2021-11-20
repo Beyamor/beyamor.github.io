@@ -1,0 +1,41 @@
+<html><head><meta charset="utf-8" /><title>Guided By Generics</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">Guided By Generics</h1><h2 class="date">Jul 23, 2016</h2><div id="content"><html><head></head><body><p>Let's make the compiler work for us, yo.</p><p>So, elevator pitch, we're gunna get the Java compiler to enforce the state of our program.</p><p>Say we had, I don't know, a <code>ThingBuilder</code>. It builds a <code>Thing</code>. You probably figured that out. You've got a good and pretty head on those shoulders of yours. It looks like this (the <code>ThingBuilder</code>, not your head):</p><pre><code class="language-java">class ThingBuilder {
+	int foo;
+	boolean bar;
+	String baz;
+
+	ThingBuilder setFoo(int foo) {
+		this.foo = foo;
+		return this;
+	}
+
+	ThingBuilder setBar(boolean bar) {
+		this.bar = bar;
+		return this;
+	}
+
+	ThingBuilder setBaz(String baz) {
+		this.baz = baz;
+		return this;
+	}
+
+	Thing build() {
+		return new Thing(foo, bar, baz);
+	}
+}</code></pre><p>Pretty straightforward, I hope. Set up a bunch of state, then act on it.</p><p>But, like, I'm a forgetful guy. What if I forget to set some state? Like, say I never call <code>setBar</code>? Dang yo, absolute tragedy. If only there was some way to save us from such a terrible calamity.</p><p>In statically-typed languages that don't <a href="https://golang.org/">live in a self-indulgent land of make believe</a>, you have something like Java's generics - some kind of type-level parameterization. This is programming at the compiler level, rather than runtime.</p><p>Can we use that? Get our bro the compiler to give us a hand here? Well, yeah, duh, of course we can, otherwise I wouldn't be writing this blog.</p><h1>Type Tutelage</h1><p>Okay, super quick refresher on Java's generics. A <code>List&lt;E&gt;</code> is a generic <code>List</code> type parameterized by <code>E</code>. We could have, for example, a <code>List&lt;String&gt;</code> or a <code>List&lt;Bucket&gt;</code> or whatever.</p><p>There's a special type parameter, <code>?</code>. It's a complete unknown. A <code>List&lt;?&gt;</code>, for example, is a <code>List</code> of some unknowable type.</p><p>Another thing! Unlike, say, C++, in Java, generics are erased. That means a <code>List&lt;SweetPotato&gt;</code> is the same type at run time as a <code>List&lt;Yam&gt;</code>, namely, a plain ol'  <code>List</code>. The compiler will prevent you from accidentally mixing different parameterized types up, but they're actually the same thing and you could, for example, forcibly cast between one to another.</p><h1>Got My Bracket</h1><p>Anyway, the idea's pretty simple, I think. We use type parameters as flags to describe the state of our builder. A field is either set or not; the type parameter signals which. We can only build with the builder when it's in a valid state.</p><p>We have a type parameter for each field in our builder, so our <code>ThingBuilder</code> from before is going to look something like this:</p><pre><code class="language-java">class ThingBuilder&lt;Foo,Bar,Baz&gt; {
+	int foo;
+	boolean bar;
+	String baz;
+
+	// ...
+}</code></pre><p>At first, none of the fields have been set. We'll indicate unset fields by using <code>?</code> for the type parameter. So, our initial <code>ThingBuilder</code> will look like this:</p><pre><code class="language-java">ThingBuilder&lt;?,?,?&gt; builder = ThingBuilder.create();</code></pre><p>Now, whenever a field is set, we'll indicate that by settings its type parameter to some other type, say, <code>Object</code>. The <code>setFoo</code> method, for example, becomes this:</p><pre><code class="language-java">ThingBuilder&lt;Object,Bar,Baz&gt; setFoo(int foo) {
+	this.foo = foo;
+	return (ThingBuilder&lt;Object,Bar,Baz&gt;) this;
+}</code></pre><p>Notice that we force <code>Foo</code> to <code>Object</code>, leaving <code>Bar</code> and <code>Baz</code> unchanged. When we call it, the type parameter gets set:</p><pre><code class="language-java">ThingBuilder&lt;Object,?,?&gt; updatedBuilder = builder
+						.setFoo(1);</code></pre><p>Cool, right? Updating a type parameter at a time, we can tell at the compiler-level what fields have been set. But how do we use that?</p><p>We're going to have to move things around just a little but, I think. At least, I haven't thought of a way around it. We pull the <code>build</code> method out into a static method that'll take the builder as a parameter. Not just any builder though; by constraining the type parameters, it'll only take a fully set, legit builder. Get your eyes on this:</p><pre><code class="language-java">static Thing build(ThingBuilder&lt;Object,Object,Object&gt; builder) {
+	// ...
+}</code></pre><p>Check it, right. The type parameters specify <code>Object</code>. <code>?</code> ain't gunna cut it. We don't want no scrub. This, for example, won't compile:</p><pre><code class="language-java">ThingBuilder&lt;?,?,?&gt; builder = ThingBuilder.create();
+ThingBuilder.build(builder);</code></pre><p>After we set the fields, though? No problemo:</p><pre><code class="language-java">ThingBuilder&lt;Object,Object,Object&gt; builder = ThingBuilder.created()
+	.setFoo(1)
+	.setBar(true)
+	.setBaz(&quot;hey!&quot;);
+ThingBuilder.build(builder);</code></pre><p>Boom! Speaking in the language of generics, we convince the compiler to check our code for us. (This, by the way, is the penniless man's <a href="https://en.wikipedia.org/wiki/Dependent_type">dependent types</a>)</p><p>Is it worth it? Probably not, it's a lot of extra code! Is it cool? Not really, most of your coworkers would just be confused and angry if you actually did this! But did I write a blog about it? You betcha!</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>

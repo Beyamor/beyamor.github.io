@@ -1,0 +1,21 @@
+<html><head><meta charset="utf-8" /><title>A Splash Of Hash</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">A Splash Of Hash</h1><h2 class="date">Aug 17, 2012</h2><div id="content"><html><head></head><body><p>Hey yo hey. Clojure and crap.</p><p>The always brilliant Nicolas Guillemot wrote this cool <a href="https://github.com/nguillemot/viking/blob/master/source/include/viking/HashString.hpp">compile time string hash thing</a> with C++0x11's <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Generalized_constant_expressions">constexpr</a> keyword. It's pretty legit. If the string is known at compile time, it gets hashed at compile time. Alright. Let's get some Clojure code doing the same thing, just for fun.</p><p>The algorithm is mad simple. Check it out <a href="http://www.cse.yorku.ca/~oz/hash.html#djb2">here</a>, but the gist is a bitshift and some magic numbers. Okay. First things first. We're going to flip a couple of switches to put the pedal to the metal.</p><pre><code>(set! *warn-on-reflection* true)
+(set! *unchecked-math* true)</code></pre><p><code>*warn-on-reflection*</code> makes the runtime tell you when it uses reflection to determine the type of a value. By using <em>typehints</em>, we can supply the type information so that the reflection isn't needed. It's a little optimization, but worth showing off. <code>*unchecked-math*</code> is used to say, hey, integer overflow? IDGAF.</p><p>Here's the solid juice:</p><pre><code>(defn hash-string [s]
+  (if (empty? s)
+    0
+    (loop [h 5381, s s]
+      (if (empty? s)
+        h
+        (recur
+          (+ (bit-shift-left h 5) h (-&gt; s (get 0) int))
+          (subs s 1))))))</code></pre><p>If the string starts empty, it spits out 0. Otherwise, it does the recursive shift-add-add thing, iterating through the string. Okay, not much to see here, it's math stuff. Moving on.</p><p>The really cool part of this is implementing the compile-time hashing off known strings. Clojure's got macros, you dig? Macros that rock. Macros that execute things at compile-time. Put your eyes on this:</p><pre><code>(defmacro string-hash [e]
+  (if (string? e)
+    (do
+      (println (str &quot;Compile time hash for: &quot; e))
+      (hash-string e))
+    `(do
+       (println (str &quot;Runtime hash for: &quot; ~e))
+       (hash-string ~e))))</code></pre><p>The <code>string-hash</code> macro takes <em>something</em>. If the thing, <code>e</code>, is a string, it's immediately hashed and the result is output. Otherwise, if <code>e</code> is not a string - if it is, for example, a symbol - <code>(hash-string e)</code> is output to be evaluated at run-time. And that's it. The macro evaluates strings at compile-time where it can and supplies the instruction to do it at run-time when it can't. Neat.</p><p>You can use it kinda like this:</p><pre><code>(string-hash &quot;compile string&quot;) ; evaulated at compile time
+
+(defn runtime-hash [s]
+  (string-hash s))
+(runtime-hash &quot;runtime string&quot;) ; evaulated at run-time</code></pre><p>Man, I gotta get better syntax highlighting here.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
