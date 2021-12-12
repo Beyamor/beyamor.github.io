@@ -76,9 +76,11 @@
 # 14</code></pre><p>Cool! But back to the problem at hand, we probably only want the <i>final</i> total, right?</p><h1>Begining To Enderstand</h1>awk lets us use two special keywords <code>BEGIN</code> and <code>END</code> before a statement to indicate it should execute only at the start or end of processing the file, instead of on each record. We can use them like so:<pre><code>BEGIN {
     print &quot;Start&quot;
 }
+
 {
     print
 }
+
 END {
     print &quot;End&quot;
 }
@@ -92,6 +94,7 @@ END {
 # End</code></pre><p>We can use <code>END</code> to print the total response time <i>after</i> we've added everything up:</p><pre><code>{
     sum += $NF
 }
+
 END {
     print sum
 }
@@ -99,6 +102,7 @@ END {
 # 14</code></pre><p>Neat! awk gives us another magic variable for the number of records called <code>NR</code>, so we can spit out the average response time:</p><pre><code>{
     sum += $NF
 }
+
 END {
     print sum / NR
 }
@@ -109,6 +113,7 @@ END {
         count += 1
     }
 }
+
 END {
     print sum / count
 }
@@ -117,6 +122,7 @@ END {
     sum += $NF
     count += 1
 }
+
 END {
     print sum / count
 }
@@ -125,6 +131,7 @@ END {
     sum += $NF
     count += 1
 }
+
 END {
     print sum / count
 }
@@ -133,6 +140,7 @@ END {
     sum += $NF
     count += 1
 }
+
 END {
     print sum / count
 }
@@ -142,6 +150,7 @@ END {
         sum[path] += $NF
         count[path] += 1
 }
+
 END {
         for (path in sum) {
                 print path, (sum[path] / count[path])
@@ -152,11 +161,13 @@ END {
 # /projects 3</code></pre><h1>Finding A Function</h1>Another handy tool awk gives us is functions. We can define one for the averages:<pre><code>function average(sum, count) {
     return sum / count
 }
+
 {
         path = $2
         sum[path] += $NF
         count[path] += 1
 }
+
 END {
         for (path in sum) {
                 print path, average(sum[path], count[path])
