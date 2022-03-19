@@ -27,7 +27,7 @@ counter = createCounter()
 counter(&quot;count&quot;)
 counter(&quot;count&quot;)
 console.log(counter(&quot;get&quot;))
-# =&gt; 2</code></pre><p>Cool! But we're already starting to see a lot of boilerplate. I bet we can cut that down some.</p><h1>Attributed To Attributes</h1><p>Let's take the JavaScript view of objects. What is an object? A miserable little pile of attributes. We can do that, no prob. But first we'll need the duct tape of programming: dictionaries. If we could use objects, well, we'd use 'em here, but that's off the table, so we'll define our own:</p><pre><code class="language-coffee">emptyDictionary = null
+# =&gt; 2</code></pre><p>Cool! But we're already starting to see a lot of boilerplate. I bet we can cut that down some.</p><h1 id="attributed-to-attributes">Attributed To Attributes</h1><p>Let's take the JavaScript view of objects. What is an object? A miserable little pile of attributes. We can do that, no prob. But first we'll need the duct tape of programming: dictionaries. If we could use objects, well, we'd use 'em here, but that's off the table, so we'll define our own:</p><pre><code class="language-coffee">emptyDictionary = null
 
 get = (dictionary, key) -&gt;
 	if dictionary?
@@ -62,7 +62,7 @@ greeter = newObject()
 greeter &quot;setAttribute&quot;, &quot;greet&quot;, (self, name) -&gt;
 	console.log(&quot;Hello, &quot; + name)
 
-greeter(&quot;greet&quot;, &quot;lovely reader&quot;)</code></pre><p>Straightforward enough, right? An object'll come with one baked-in method, <code>setAttribute</code>, and it can build everything from that. Sure, we're skipping over some error handling, but shwatevs. That'll be a common theme.</p><p>What next? Hm. How about prototypical inheritance? We'll take JavaScript as our model again. When an object looks up an attribute and it doesn't find it on itself, it should look it up in its parent. But how do we do that?</p><h1>Inheriting Inheritance</h1><p>Well, first, let's get a little more flexibility in our objects. Right now, getting attributes is hardcoded as a direct dictionary lookup, but what if it was just another method?</p><pre><code class="language-coffee">newObject = -&gt;
+greeter(&quot;greet&quot;, &quot;lovely reader&quot;)</code></pre><p>Straightforward enough, right? An object'll come with one baked-in method, <code>setAttribute</code>, and it can build everything from that. Sure, we're skipping over some error handling, but shwatevs. That'll be a common theme.</p><p>What next? Hm. How about prototypical inheritance? We'll take JavaScript as our model again. When an object looks up an attribute and it doesn't find it on itself, it should look it up in its parent. But how do we do that?</p><h1 id="inheriting-inheritance">Inheriting Inheritance</h1><p>Well, first, let's get a little more flexibility in our objects. Right now, getting attributes is hardcoded as a direct dictionary lookup, but what if it was just another method?</p><pre><code class="language-coffee">newObject = -&gt;
 	attributes = emptyDictionary
 
 	getAttribute = (self, name) -&gt;
@@ -118,7 +118,7 @@ counter = baseCounter &quot;extend&quot;
 counter &quot;init&quot;
 counter &quot;count&quot;
 console.log(counter(&quot;get&quot;))
-# =&gt; 1</code></pre><p>Ack, whose keyboard had indigestion? Let's clean that up some.</p><h1>Refining Defining</h1><p>Mm, first off, defining new methods is super repetitive. We reduce it a bit by adding a callback to define new methods when extending:</p><pre><code class="language-coffee">object &quot;setAttribute&quot;, &quot;extend&quot;, (parent, onDefinition) -&gt;
+# =&gt; 1</code></pre><p>Ack, whose keyboard had indigestion? Let's clean that up some.</p><h1 id="refining-defining">Refining Defining</h1><p>Mm, first off, defining new methods is super repetitive. We reduce it a bit by adding a callback to define new methods when extending:</p><pre><code class="language-coffee">object &quot;setAttribute&quot;, &quot;extend&quot;, (parent, onDefinition) -&gt;
 	child = newObject()
 
 	# ...
@@ -188,7 +188,7 @@ counter2 = baseCounter &quot;new&quot;
 counter2 &quot;count&quot;
 counter2 &quot;count&quot;
 console.log(counter2(&quot;get&quot;))
-# =&gt; 2</code></pre><p>That's not so bad, is it?</p><p>Okay, let's do one last thing: dispatching to the parent.</p><h1>Proud Parents</h1><p>Remember the <code>excitedGreeter</code>? It's, uh, the <code>greeter</code> but more different:</p><pre><code class="language-coffee">greeter = object &quot;extend&quot;, (def) -&gt;
+# =&gt; 2</code></pre><p>That's not so bad, is it?</p><p>Okay, let's do one last thing: dispatching to the parent.</p><h1 id="proud-parents">Proud Parents</h1><p>Remember the <code>excitedGreeter</code>? It's, uh, the <code>greeter</code> but more different:</p><pre><code class="language-coffee">greeter = object &quot;extend&quot;, (def) -&gt;
 	def &quot;greet&quot;, (self, name) -&gt;
 		console.log(&quot;Hello, &quot; + name)
 
@@ -292,4 +292,4 @@ horse(&quot;describe&quot;)
 
 seahorse = animal(&quot;extend&quot;)(&quot;mixin&quot;, swimMixin, neighMixin)
 seahorse(&quot;describe&quot;)
-# =&gt; I swim and neigh</code></pre><p>Phew! Okay! I think let's call it quits maybe!</p><p>So hey, what'd we do today? We discovered that you can build a pretty righteous object system using plain ol' functions. Starting with message dispatch, we built up state, prototypical inheritance, and mixins. That's pretty cool!</p><h1>The Dang Lang</h1><p>How does the programming language I mentioned <em>waaay</em> back at the start tie into this? Partly smoothing over some of the roughness of stuff like the <code>extend</code> mini-language with built-in syntax and partly expanding on the method dispatch.</p><p>Remember when we added special handling for names starting with <code>@</code>? That's a taste of doing more interesting dispatch than a straight dictionary lookup of the method name. Another path to explore would be dispatching on the arguments too. But oh, I've said too much. That's a subject for another blog.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
+# =&gt; I swim and neigh</code></pre><p>Phew! Okay! I think let's call it quits maybe!</p><p>So hey, what'd we do today? We discovered that you can build a pretty righteous object system using plain ol' functions. Starting with message dispatch, we built up state, prototypical inheritance, and mixins. That's pretty cool!</p><h1 id="the-dang-lang">The Dang Lang</h1><p>How does the programming language I mentioned <em>waaay</em> back at the start tie into this? Partly smoothing over some of the roughness of stuff like the <code>extend</code> mini-language with built-in syntax and partly expanding on the method dispatch.</p><p>Remember when we added special handling for names starting with <code>@</code>? That's a taste of doing more interesting dispatch than a straight dictionary lookup of the method name. Another path to explore would be dispatching on the arguments too. But oh, I've said too much. That's a subject for another blog.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
