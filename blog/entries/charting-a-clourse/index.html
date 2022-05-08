@@ -1,0 +1,70 @@
+<html><head><meta charset="utf-8" /><title>Charting A Clourse</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">Charting A Clourse</h1><span class="date">Apr 30, 2022</span><div id="content"><html><head></head><body><p>I remember my brother nudging me towards a pack of Magic cards and, like a charismatic drug dealer, promising I'd enjoy it. Hundreds of dollars have proven him woefully correct.</p><p>One of the things I'm noodling on in my spare time is a deck builder for Magic. There's a bunch of these already, things like <a href="https://www.moxfield.com/">Moxfield</a>, but the siren song of rolling your own rarely fails to snare even the most wary programmer.</p><p>Anyway, it's a lot of fun to have a project like this! I don't write tons of code in my day-to-day, so it's a blast to be able to just <i>build</i> without working too much about code quality.</p><p>I am a real cool dude, so naturally I was real excited to add a chart! Well, look, charts are neat. Who doesn't like charts? The only thing cooler than charts is writing code to make charts.</p><p>Let's talk about how to add a chart in ClojureScript!</p><h1 id="staging-the-script">Staging The Script</h1>So, let's say we've got a dataset of red and blue values:<pre><code class="language-clojure">(def data [{:x 1 :red 0 :blue 2}
+           {:x 2 :red 2 :blue 0}
+           {:x 3 :red 1 :blue 1}
+           {:x 4 :red 2 :blue 4}
+           {:x 5 :red 1 :blue 3}])</code></pre><p>My simple simian brain needs shapes and colours. How do we make a chart of that data in ClojureScript?</p><p><img alt="Chart of data" src="https://i.imgur.com/KPL3cND.png" /></p><p>As a refresher, ClojureScript is Clojure compiling to JavaScript in the browser. I'm a really big fan, especially with <a href="https://figwheel.org/">Figwheel</a>, magic made real in the form of hot reloads. With <a href="https://reagent-project.github.io/">Reagent</a>, build over React, it's downright lovely to put a page together.</p><p>It's pretty easy to get started:</p><pre><code>lein new figwheel cljschart -- --reagent
+cd cljschart
+lein figwheel</code></pre><p>That'll open up a page in the browser running the code in <code>cljschart.core</code>. It does hot reloads, so code changes immediately propagate.</p><h1 id="reading-reagent">Reading Reagent</h1>Reagent is really easy. It uses <a href="https://github.com/weavejester/hiccup">Hiccup</a> syntax for elements, so something like:<pre><code class="language-clojure">[:div
+ {:style {:color &quot;red&quot;}}
+ [:p &quot;Hello&quot;]
+ [:p &quot;world!&quot;]]</code></pre><p>translates to:</p><pre><code class="language-html">&lt;div style=&quot;color: red;&quot;&gt;
+    &lt;p&gt;Hello&lt;/p&gt;
+    &lt;p&gt;world!&lt;/p&gt;
+&lt;/div&gt;</code></pre>`<p>Reagent makes it trivial to drive UI updates from state changes by automatically re-rendering anything that references the state through its atom:</p><pre><code class="language-clojure">(defonce app-state
+  (reagent.core/atom {:text &quot;hello&quot;}))
+  
+(defn render []
+  [:div
+    [:p (:text @app-state)]]) ; References the app-state atom to render :text
+    
+(reagent.dom/render [render]
+                    (. js/document (getElementById &quot;app&quot;)))
+
+(swap! app-state assoc :text &quot;goodbye&quot;) ; Triggers a re-render</code></pre><p>So, that's the easy part. Now, let's say we've got our dataset in the <code>app-state</code>:</p><pre><code class="language-clojure">(defonce app-state (reagent.core/atom {:data data}))</code></pre><p>How do we stick that in a chart?</p><h1 id="reaching-for-recharts">Reaching For Recharts</h1>There's a handy React charting library in the form of <a href="https://recharts.org/en-US/">Recharts</a>. It does what it says on the tin, it makes charts. Great! How do we actually use it?<p>Clojure has its own world for managing dependencies, so consuming node/bower libraries is a little different than it would be with pure JavaScript, but there are actually a few options available.</p><p>I'm going with a blunt but easy approach. <a href="http://cljsjs.github.io/">CLJSJS</a> bundles up a bunch of common JavaScript libraries so they're easy to pull in with Clojure package managers. We can just pop the Recharts dependency into our <code>project.clj</code>:</p><pre><code class="language-clojure">:dependencies [[org.clojure/clojure &quot;1.11.1&quot;]
+               [org.clojure/clojurescript &quot;1.11.4&quot;]
+               [org.clojure/core.async  &quot;0.4.500&quot;]
+               [reagent &quot;1.1.1&quot;]
+               ; Here we go!
+               [cljsjs/recharts &quot;2.0.8-0&quot;]]</code></pre><p>Now that we've got Recharts included, we can restart Figwheel and require it in <code>core.clj</code>:</p><pre><code class="language-clojure">(:require [reagent.core :as reagent :refer [atom]]
+          [reagent.dom :as rd]
+          ; Ready to chart!
+          [recharts])</code></pre><p>Groovy, we've got the dependency and we're good to go! Now, where are we going?</p><h1 id="chasing-charts">Chasing Charts</h1>Recharts has a ton of examples available. We'll be basically following what <a href="https://recharts.org/en-US/examples/SimpleLineChart">the simple line example</a> sets up.<p>Reagent lets us <a href="https://github.com/reagent-project/reagent/blob/master/doc/InteropWithReact.md#creating-reagent-components-from-react-components">chuck React components into the Hiccup data</a> with <code>:&gt; &lt;Classname&gt;</code>, so we can set up a chart for our data with the Rechart components from the simple line example:</p><pre><code class="language-clojure">(defn render-chart
+  [app-state]
+  [:&gt; recharts/LineChart
+   {:width 500 :height 500
+    :data (:data @app-state)}
+   [:&gt; recharts/CartesianGrid
+    {:strokeDasharray &quot;3 3&quot;}]
+   [:&gt; recharts/XAxis
+    {:dataKey :x}]
+   [:&gt; recharts/YAxis]
+   [:&gt; recharts/Tooltip]
+   [:&gt; recharts/Legend]
+   [:&gt; recharts/Line
+    {:type &quot;monotone&quot;
+     :dataKey :red
+     :stroke &quot;red&quot;}]
+   [:&gt; recharts/Line
+    {:type &quot;monotone&quot;
+     :dataKey :blue
+     :stroke &quot;blue&quot;}]])</code></pre><p>Easy as that! <code>:dataKey</code> specifies which key in the map to pull the value from, so we set up an <code>XAxis</code> over the <code>:x</code> values, then draw a separate <code>Line</code> for the <code>:red</code> and <code>:blue</code> values.</p><p>Hey, it does the thing!</p><p><img alt="Chart of data" src="https://i.imgur.com/KPL3cND.png" /></p><h1 id="controlling-our-contours">Controlling Our Contours</h1>One more quick thing, it's pretty quick to put together controls to adjust the data. There's no need to do this except that it's fun to watch the chart move around. That surely counts for something.<p>We'll add a range <code>input</code> for each value. We just need to update the <code>app-state</code> atom when the <code>input</code> changes, so we can register an <code>:onInput</code> listener to <code>swap!</code> the datapoint to the new value:</p><pre><code class="language-clojure">(defn render-value-control
+  [app-state color idx]
+  [:input
+   {:type &quot;range&quot; :min 0 :max 5
+    :value (get-in @app-state [:data idx color])
+    :onInput #(swap! app-state assoc-in [:data idx color]
+                     (.. % -target -value))}])</code></pre><p>We'll do this for each color and index:</p><pre><code class="language-clojure">(defn render-controls
+  [app-state]
+  [:div
+   (for [color [:red :blue]]
+     ^{:key color}
+     [:div
+      [:h1 (str (name color) &quot;: &quot;)]
+      (for [idx (range (count (:data @app-state)))]
+        ^{:key idx}
+        [:span
+         (str idx)
+         [render-value-control app-state color idx]])])])</code></pre><p>And put it all together:</p><pre><code class="language-clojure">(defn render []
+  [:div {:style {:display :flex}}
+   [render-chart app-state]
+   [render-controls app-state]])</code></pre><p>Now when we change the sliders, the chart updates. Cool!</p><p /><div id="charting-a-clourse-demo"></div> <script src="/blog/entries/charting-a-clourse/resources/cljschart.js" type="text/javascript"></script><p /></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
