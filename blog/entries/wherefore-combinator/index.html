@@ -1,11 +1,35 @@
-<html><head><meta charset="utf-8" /><title>Wherefore Combinator</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">Wherefore Combinator</h1><span class="date">Mar 11, 2016</span><div id="content"><html><head></head><body><p>Like them <a href="/blog/entries/church-numerals-review">devout numbers</a>, the Y combinator is a right of passage for any would-be functional programmer.</p><p>No, we're not talking about <a href="http://qz.com/810778/y-combinator-has-no-problem-with-partner-peter-thiel-funding-donald-trump-sam-altman-says/">orange-flavoured racism</a>, we've got some functional fun up our sleeves. I've never really understood the damn thing and I'm excited to try to rectify that.</p><p>So, how do it do?</p><p>Well, aight, here's the sitch. Say we had a recursive function, like, math's most excited function, the factorial:</p><pre><code class="language-javascript">var factorial = function(n) {
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Wherefore Combinator</title>
+  <link href="/css/shades-of-purple.min.css" rel="stylesheet">
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/blog.css" rel="stylesheet">
+  <script src="/js/highlight.min.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div id="header">
+   <h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a>
+  </div>
+  <div id="content">
+   <div id="blog">
+    <h1 class="title">Wherefore Combinator</h1><span class="date">Mar 11, 2016</span>
+    <div id="content">
+     <p>Like them <a href="/blog/entries/church-numerals-review">devout numbers</a>, the Y combinator is a right of passage for any would-be functional programmer.</p>
+     <p>No, we're not talking about <a href="http://qz.com/810778/y-combinator-has-no-problem-with-partner-peter-thiel-funding-donald-trump-sam-altman-says/">orange-flavoured racism</a>, we've got some functional fun up our sleeves. I've never really understood the damn thing and I'm excited to try to rectify that.</p>
+     <p>So, how do it do?</p>
+     <p>Well, aight, here's the sitch. Say we had a recursive function, like, math's most excited function, the factorial:</p>
+     <pre><code class="language-javascript">var factorial = function(n) {
 	if (n == 0) {
 		return 1;
 	}
 	else {
 		return n * factorial(n-1);
 	}
-};</code></pre><p>Now, here's the game: what if a function couldn't refer to itself in its definition? How could we make recursion work? </p><p>Easy! Like any good functional programmer, we make the thing a higher-order function. Simple enough, if a little mind-bending, we can pass the function to itself:</p><pre><code class="language-javascript">var factorialStep = function(self) {
+};</code></pre>
+     <p>Now, here's the game: what if a function couldn't refer to itself in its definition? How could we make recursion work? </p>
+     <p>Easy! Like any good functional programmer, we make the thing a higher-order function. Simple enough, if a little mind-bending, we can pass the function to itself:</p>
+     <pre><code class="language-javascript">var factorialStep = function(self) {
 	return function(n) {
 		if (n == 0) {
 			return 1;
@@ -19,7 +43,10 @@
 
 var factorial = function(n) {
 	return factorialStep(factorialStep)(n);
-};</code></pre><p>Neat! <code>recur</code> is a little tricky here, but it's the next <code>factorialStep</code>, created by threading <code>self</code> through to, well, itself, which returns a function ready to be called with the next <code>n</code>.</p><p>Let's clean stuff up a bit though. Ideally, we'd just pass <code>factorialStep</code> the <code>recur</code> function and eschew all the grody details of the implementation. And we can do that by shuffling things around a little: </p><pre><code class="language-javascript">var factorialStep = function(recur) {
+};</code></pre>
+     <p>Neat! <code>recur</code> is a little tricky here, but it's the next <code>factorialStep</code>, created by threading <code>self</code> through to, well, itself, which returns a function ready to be called with the next <code>n</code>.</p>
+     <p>Let's clean stuff up a bit though. Ideally, we'd just pass <code>factorialStep</code> the <code>recur</code> function and eschew all the grody details of the implementation. And we can do that by shuffling things around a little: </p>
+     <pre><code class="language-javascript">var factorialStep = function(recur) {
 	return function(n) {
 		if (n == 0) {
 			return 1;
@@ -40,7 +67,11 @@ var factorial = function(n) {
 	};
 
 	return recursionHelper(recursionHelper)(n);
-};</code></pre><p>Is this better? Kinda! We'll circle back to that. Check that <code>recursionHelper</code> function though. When called, it returns a <code>factorialStep</code>, passing it a <code>recur</code> method.</p><p><code>recur</code> is tricky again! Remember, <code>self</code> is <code>recursionHelper</code> and when we call it, it returns the next <code>factorialStep</code>. So, when <code>recur</code> is called, it creates another <code>factorialStep</code> and calls it with the next <code>n</code>. Oof, getcher brain around that.</p><p>Why's this better? Well, if you peer through the thick fog of FP fugure, you can see that the bulk of <code>factorial</code> can be pulled out and applied to any recursive function. Let's do that! You remember ol' Fibonacci?</p><pre><code class="language-javascript">var makeRecursive = function(f) {
+};</code></pre>
+     <p>Is this better? Kinda! We'll circle back to that. Check that <code>recursionHelper</code> function though. When called, it returns a <code>factorialStep</code>, passing it a <code>recur</code> method.</p>
+     <p><code>recur</code> is tricky again! Remember, <code>self</code> is <code>recursionHelper</code> and when we call it, it returns the next <code>factorialStep</code>. So, when <code>recur</code> is called, it creates another <code>factorialStep</code> and calls it with the next <code>n</code>. Oof, getcher brain around that.</p>
+     <p>Why's this better? Well, if you peer through the thick fog of FP fugure, you can see that the bulk of <code>factorial</code> can be pulled out and applied to any recursive function. Let's do that! You remember ol' Fibonacci?</p>
+     <pre><code class="language-javascript">var makeRecursive = function(f) {
 	var recursionHelper = (function(self) {
 		var recur = function(n) {
 			return self(self)(n);
@@ -72,10 +103,17 @@ var fibonacci = makeRecursive(function(recur) {
 			return recur(n-1) + recur(n-2);
 		}
 	}
-});</code></pre><p>We can poke <code>makeRecursive</code> a bit more to bring it in line with society's standards. Let's <em>Pretty Function</em> that down-and-out boy.</p><p>Remember, another way to name a value is to bind it as a function parameter. So, for example:</p><pre><code class="language-javascript">var y = 1;
-console.log(y);</code></pre><p>becomes:</p><pre><code class="language-javascript">(function(y) {
+});</code></pre>
+     <p>We can poke <code>makeRecursive</code> a bit more to bring it in line with society's standards. Let's <em>Pretty Function</em> that down-and-out boy.</p>
+     <p>Remember, another way to name a value is to bind it as a function parameter. So, for example:</p>
+     <pre><code class="language-javascript">var y = 1;
+console.log(y);</code></pre>
+     <p>becomes:</p>
+     <pre><code class="language-javascript">(function(y) {
 	console.log(y);
-})(1);</code></pre><p>Applying the same to <code>makeRecursive</code>, this:</p><pre><code class="language-javascript">var makeRecursive = function(f) {
+})(1);</code></pre>
+     <p>Applying the same to <code>makeRecursive</code>, this:</p>
+     <pre><code class="language-javascript">var makeRecursive = function(f) {
 	var recursionHelper = function(self) {
 		var recur = function(n) {
 			return self(self)(n);
@@ -85,7 +123,8 @@ console.log(y);</code></pre><p>becomes:</p><pre><code class="language-javascript
 	};
 
 	return recursionHelper(recursionHelper);
-}</code></pre>becomes:<pre><code class="language-javascript:">var makeRecursive = function(f) {
+}</code></pre>becomes:
+     <pre><code class="language-javascript:">var makeRecursive = function(f) {
 	return (function(recursionHelper) {
 		return recursionHelper(recursionHelper);
 	})(function(self) {
@@ -94,7 +133,9 @@ console.log(y);</code></pre><p>becomes:</p><pre><code class="language-javascript
 		};
 		return f(recur);
 	});
-};</code></pre><p>But huh, those variable names don't make a lotta sense anymore. Let's fix that up and heck, inline <code>recur</code>. We can also generalize things by forwarding all of the arguments, not just <code>n</code>, with <code>apply</code>: </p><pre><code class="language-javascript">var makeRecursive = function(f) {
+};</code></pre>
+     <p>But huh, those variable names don't make a lotta sense anymore. Let's fix that up and heck, inline <code>recur</code>. We can also generalize things by forwarding all of the arguments, not just <code>n</code>, with <code>apply</code>: </p>
+     <pre><code class="language-javascript">var makeRecursive = function(f) {
 	return (function(x) {
 		return x(x);
 	})(function(x) {
@@ -102,4 +143,12 @@ console.log(y);</code></pre><p>becomes:</p><pre><code class="language-javascript
 			return x(x).apply(null, arguments);
 		});
 	});
-};</code></pre><p>And that beautiful monstrosity is the Y combinator! Now we can make all sortsa recursive functions! How cool is that!</p><p>Yeah, it's pretty opaque just to look at. I dunno, I'm not sure I'd even recognize the damn thing if I passed it on the street, but y'know, the rote, mechanical steps that get us there are each pretty straightforward, if, like, you spend a few hours staring at 'em.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
+};</code></pre>
+     <p>And that beautiful monstrosity is the Y combinator! Now we can make all sortsa recursive functions! How cool is that!</p>
+     <p>Yeah, it's pretty opaque just to look at. I dunno, I'm not sure I'd even recognize the damn thing if I passed it on the street, but y'know, the rote, mechanical steps that get us there are each pretty straightforward, if, like, you spend a few hours staring at 'em.</p>
+    </div>
+    <script type="text/javascript">hljs.highlightAll();</script>
+   </div>
+  </div>
+ </body>
+</html>

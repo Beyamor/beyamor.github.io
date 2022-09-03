@@ -1,12 +1,42 @@
-<html><head><meta charset="utf-8" /><title>The N-complete Problem</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">The N-complete Problem</h1><span class="date">Jul 11, 2011</span><div id="content"><html><head></head><body><p>Long, long ago, sometime around the point in my life where I was still playing with Beyblades - the later years of highschool, if memory serves - I first learned of <em><a href="http://en.wikipedia.org/wiki/Gadsby_(novel)">Gadsby</a></em>, the novel written by Ernest Vincent Wright <em>entirely</em> without the letter &quot;e.&quot; I don't know if you've picked up on this over the course of your life, dear reader, but &quot;e&quot; is a tremendously valuable letter. You'll find it rearing its head in everything from &quot;cheese&quot; and &quot;spleen&quot; all the way through &quot;elephantine,&quot; which, I'm sure you'll concede, are essential elements of any vocabulary. Anyway, at the time, I was floored by this feat and I immediately vowed to forfeit the use of &quot;e&quot; for an entire day.</p><p>I almost made it to lunch.</p><p>Anyway, a recent assignment tasked us with writing a C or Java program which would read input, count the number of lowercase &quot;n's&quot; and determine whether that number is a <a href="http://en.wikipedia.org/wiki/Twin_prime">twin prime</a> - that is, the number is a prime that differs from another by two. To test it, we were to feed the program its own source code as the input. As proof of correctness, we were also supposed to print out the code and highlight the &quot;n's&quot;. Now, (with small numbers) this is an almost insultingly trivial undertaking. However, taking umbrage with the need to take pen to paper for a programming assignment, a friend suggested we write the program without using &quot;n&quot;.</p><p>Which, obviously, is a stupid thing to do.</p><p>And a really neat challenge.</p><p>The first great obstacle is the main function - that is, the mai<b>n</b> function. See, by convention, every C program must have a function called <em>main</em>. This is where the program actually starts executing, the point where everything kicks off. Traditionally speaking, without a function called main, you can't have a program that runs. Well, that's a bother.</p><p>Some internet sleuthing dug up <a href="http://in.answers.yahoo.com/question/index?qid=20090502113050AAxwtay">a solution</a> at <a href="http://www.yahoolaughs.com/">the last bastion of the inquisitive mind</a>. See, you can use the <em>-nostartfiles</em> with GCC to tell the compiler that you don't want to use the standard startup files and will instead specify your own entry point for the program. Then, you can set your starting point by writing a <em>_start</em> function, which, thankfully, doesn't have an &quot;n.&quot; So, with some sketchy code, we're underway:</p><pre><code class="language-//">override start place of program
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>The N-complete Problem</title>
+  <link href="/css/shades-of-purple.min.css" rel="stylesheet">
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/blog.css" rel="stylesheet">
+  <script src="/js/highlight.min.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div id="header">
+   <h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a>
+  </div>
+  <div id="content">
+   <div id="blog">
+    <h1 class="title">The N-complete Problem</h1><span class="date">Jul 11, 2011</span>
+    <div id="content">
+     <p>Long, long ago, sometime around the point in my life where I was still playing with Beyblades - the later years of highschool, if memory serves - I first learned of <em><a href="http://en.wikipedia.org/wiki/Gadsby_(novel)">Gadsby</a></em>, the novel written by Ernest Vincent Wright <em>entirely</em> without the letter "e." I don't know if you've picked up on this over the course of your life, dear reader, but "e" is a tremendously valuable letter. You'll find it rearing its head in everything from "cheese" and "spleen" all the way through "elephantine," which, I'm sure you'll concede, are essential elements of any vocabulary. Anyway, at the time, I was floored by this feat and I immediately vowed to forfeit the use of "e" for an entire day.</p>
+     <p>I almost made it to lunch.</p>
+     <p>Anyway, a recent assignment tasked us with writing a C or Java program which would read input, count the number of lowercase "n's" and determine whether that number is a <a href="http://en.wikipedia.org/wiki/Twin_prime">twin prime</a> - that is, the number is a prime that differs from another by two. To test it, we were to feed the program its own source code as the input. As proof of correctness, we were also supposed to print out the code and highlight the "n's". Now, (with small numbers) this is an almost insultingly trivial undertaking. However, taking umbrage with the need to take pen to paper for a programming assignment, a friend suggested we write the program without using "n".</p>
+     <p>Which, obviously, is a stupid thing to do.</p>
+     <p>And a really neat challenge.</p>
+     <p>The first great obstacle is the main function - that is, the mai<b>n</b> function. See, by convention, every C program must have a function called <em>main</em>. This is where the program actually starts executing, the point where everything kicks off. Traditionally speaking, without a function called main, you can't have a program that runs. Well, that's a bother.</p>
+     <p>Some internet sleuthing dug up <a href="http://in.answers.yahoo.com/question/index?qid=20090502113050AAxwtay">a solution</a> at <a href="http://www.yahoolaughs.com/">the last bastion of the inquisitive mind</a>. See, you can use the <em>-nostartfiles</em> with GCC to tell the compiler that you don't want to use the standard startup files and will instead specify your own entry point for the program. Then, you can set your starting point by writing a <em>_start</em> function, which, thankfully, doesn't have an "n." So, with some sketchy code, we're underway:</p>
+     <pre><code class="language-//">override start place of program
 _start() {
 
 	// the primary call
 	mai();
-	_exit( 0 );</code></pre>}<p>Cool. So, mai() is where we actually start our program. From there, we want to read in the input. With C, when you want to use external functions, you need to import the libraries they're defined in using the <em>include</em> directive. So, if, for example, you were, for some unknowable reason, craving a <a href="http://3.bp.blogspot.com/_0CgMz426mRU/TJpfP6hnduI/AAAAAAAABA4/r3-9GS0mwck/s1600/sausage-mcgriddle.jpg">McGriddle</a> in your C program, you'd need to include the McDonalds library like so:</p><pre><code>#include &quot;mickey_ds.h&quot;</code></pre><p>Clearly, <em>i<b>n</b>clude</em> is going to be a problem for us. However, the IO functions in <em>stdio</em> are part of the C standard libraries and so are <em>implicitly</em> included because these libraries are automatically linked when compiling. That means that we can use the IO functions to read in the input to the program without directly including them. <em>Phew</em>. Almost. Normally, we might use <em>scanf</em> to read from standard input and <em>printf</em> to print to standard output but, well, you can see the problems there. <em>Scanf</em> isn't too much of a setback. With the trusty if inelegant <em>getchar</em>, we can read from standard input to our hearts' content.</p><pre><code>// calculate sum of characters
+	_exit( 0 );</code></pre>}
+     <p>Cool. So, mai() is where we actually start our program. From there, we want to read in the input. With C, when you want to use external functions, you need to import the libraries they're defined in using the <em>include</em> directive. So, if, for example, you were, for some unknowable reason, craving a <a href="http://3.bp.blogspot.com/_0CgMz426mRU/TJpfP6hnduI/AAAAAAAABA4/r3-9GS0mwck/s1600/sausage-mcgriddle.jpg">McGriddle</a> in your C program, you'd need to include the McDonalds library like so:</p>
+     <pre><code>#include "mickey_ds.h"</code></pre>
+     <p>Clearly, <em>i<b>n</b>clude</em> is going to be a problem for us. However, the IO functions in <em>stdio</em> are part of the C standard libraries and so are <em>implicitly</em> included because these libraries are automatically linked when compiling. That means that we can use the IO functions to read in the input to the program without directly including them. <em>Phew</em>. Almost. Normally, we might use <em>scanf</em> to read from standard input and <em>printf</em> to print to standard output but, well, you can see the problems there. <em>Scanf</em> isn't too much of a setback. With the trusty if inelegant <em>getchar</em>, we can read from standard input to our hearts' content.</p>
+     <pre><code>// calculate sum of characters
 while ( (c=getchar()) &gt; 0 ) {
 	if ( c == subject ) i++;
-}</code></pre><p>See if you can work out what <em>subject</em> is. <em>Printf</em> is a little more of a problem. In C, when you want to print, you use <em>printf</em>. That's it. That's how it goes. Hell, &quot;Hello World&quot; starts with a printf. Thankfully, tacky though it may seem, we've still got <em>putchar</em>, a dinky little function that prints to the screen one character at a time. Welp, nothing to it but to write a function for printing null-terminated strings - er, <em>ull-termiated strigs</em> - to the screen.</p><pre><code>//  displays 0-marked phrases
+}</code></pre>
+     <p>See if you can work out what <em>subject</em> is. <em>Printf</em> is a little more of a problem. In C, when you want to print, you use <em>printf</em>. That's it. That's how it goes. Hell, "Hello World" starts with a printf. Thankfully, tacky though it may seem, we've still got <em>putchar</em>, a dinky little function that prints to the screen one character at a time. Welp, nothing to it but to write a function for printing null-terminated strings - er, <em>ull-termiated strigs</em> - to the screen.</p>
+     <pre><code>//  displays 0-marked phrases
 void pritf( char *s ) {
 
 	while ( *(s) != 0 ) {
@@ -30,7 +60,10 @@ void pritf( char *s ) {
 			s++;
 		}
 	}
-}</code></pre><p>You'll notice the escape characters !! and ! which respectively denote places where we want to insert &quot;n&quot; and &quot;N&quot; into the string. Of course, since explicitly writing those characters is off-limits, we've got <em>subject = 0x6e</em> and <em>subjectPrime = 0x4e</em> to hold the actual ASCII values.</p><p>There's a few other wrinkles, but the last big leap was getting values back from functions. See, normally you can make a function spit out a value by specifying it's <em>return</em> value. However, once again we run into our old frienemy &quot;n,&quot; so that's no good. Instead, the function is supplied with an additional parameter - the address of the variable where we want to store the result. After the function finishes, this variable should hold the value calculate by the function.</p><pre><code>// checks whether a value is prime
+}</code></pre>
+     <p>You'll notice the escape characters !! and ! which respectively denote places where we want to insert "n" and "N" into the string. Of course, since explicitly writing those characters is off-limits, we've got <em>subject = 0x6e</em> and <em>subjectPrime = 0x4e</em> to hold the actual ASCII values.</p>
+     <p>There's a few other wrinkles, but the last big leap was getting values back from functions. See, normally you can make a function spit out a value by specifying it's <em>return</em> value. However, once again we run into our old frienemy "n," so that's no good. Instead, the function is supplied with an additional parameter - the address of the variable where we want to store the result. After the function finishes, this variable should hold the value calculate by the function.</p>
+     <pre><code>// checks whether a value is prime
 void checkIfPrime( char m, char *isPrime ) {
 
 	char i = 0;
@@ -53,4 +86,13 @@ void checkIfPrime( char m, char *isPrime ) {
 			}
 		}
 	}
-}</code></pre><p>Boom. Look at that. Functions without returns. Output without <em>printf</em>s. Main functions without <em>main</em>s. Baby, we're ready to soar. We've done it - an entire program that doesn't use the letter &quot;n&quot; once. How cool is that? I really liked this - it made me think much more about exactly how my program was operating, not just the functions, but the actual structure of its execution. All told, it was a truly enjoyable experience. Here's hoping you got something out of this nonsense - or should I say <em>no-n-sense</em>.</p><p>No, no I probably should not.</p><p>You can find the full source <a href="http://www.wordsinthesky.com/projects/n-complete-problem/mai.c">here</a>.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
+}</code></pre>
+     <p>Boom. Look at that. Functions without returns. Output without <em>printf</em>s. Main functions without <em>main</em>s. Baby, we're ready to soar. We've done it - an entire program that doesn't use the letter "n" once. How cool is that? I really liked this - it made me think much more about exactly how my program was operating, not just the functions, but the actual structure of its execution. All told, it was a truly enjoyable experience. Here's hoping you got something out of this nonsense - or should I say <em>no-n-sense</em>.</p>
+     <p>No, no I probably should not.</p>
+     <p>You can find the full source <a href="http://www.wordsinthesky.com/projects/n-complete-problem/mai.c">here</a>.</p>
+    </div>
+    <script type="text/javascript">hljs.highlightAll();</script>
+   </div>
+  </div>
+ </body>
+</html>

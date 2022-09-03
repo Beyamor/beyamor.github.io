@@ -1,38 +1,78 @@
-<html><head><meta charset="utf-8" /><title>Doing Doto</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">Doing Doto</h1><span class="date">Apr 24, 2014</span><div id="content"><html><head></head><body><p>Hey yo hey. So, over in the world of mutable objects, it's pretty common to bash away on some poor, abused piece of data by calling a bunch of (non-referentially transparent) methods on it. I mean, it's kind of the only way anything gets done, right? That being the case, you'd think there'd be better way to do it.</p><p>See, there's tends to be a lot of verbosity. Like, say you had your <code>Foo</code> class with a couple of methods <code>doBar</code> and <code>doBaz</code>:</p><pre><code class="language-java">class Foo {
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Doing Doto</title>
+  <link href="/css/shades-of-purple.min.css" rel="stylesheet">
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/blog.css" rel="stylesheet">
+  <script src="/js/highlight.min.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div id="header">
+   <h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a>
+  </div>
+  <div id="content">
+   <div id="blog">
+    <h1 class="title">Doing Doto</h1><span class="date">Apr 24, 2014</span>
+    <div id="content">
+     <p>Hey yo hey. So, over in the world of mutable objects, it's pretty common to bash away on some poor, abused piece of data by calling a bunch of (non-referentially transparent) methods on it. I mean, it's kind of the only way anything gets done, right? That being the case, you'd think there'd be better way to do it.</p>
+     <p>See, there's tends to be a lot of verbosity. Like, say you had your <code>Foo</code> class with a couple of methods <code>doBar</code> and <code>doBaz</code>:</p>
+     <pre><code class="language-java">class Foo {
 	void doBar() {
 		System.out.println(
-			&quot;doing bar&quot;);
+			"doing bar");
 	}
 
 	void doBaz(final String anArgument) {
 		System.out.println(
-			&quot;doing baz with &quot; + anArgument);
+			"doing baz with " + anArgument);
 	}
-}</code></pre><p>Assuming you've gotta call <code>doBar</code> and <code>doBaz</code> to get things moving, you'll end up with something like this:</p><pre><code class="language-java">Foo foo = new Foo()
+}</code></pre>
+     <p>Assuming you've gotta call <code>doBar</code> and <code>doBaz</code> to get things moving, you'll end up with something like this:</p>
+     <pre><code class="language-java">Foo foo = new Foo()
 foo.doBar();
-foo.doBaz(&quot;an argument&quot;);</code></pre><p>A lot of <code>foo</code> up in that dude, eh? Like, c'mon man, we get it. There's a <code>foo</code>. We're doing things to it. Cut to the chase already.</p><p>A well-designed API might allow you to <a href="http://en.wikipedia.org/wiki/Method_chaining">chain methods</a> by returning the target in each method. Something like this:</p><pre><code class="language-java">class Foo {
+foo.doBaz("an argument");</code></pre>
+     <p>A lot of <code>foo</code> up in that dude, eh? Like, c'mon man, we get it. There's a <code>foo</code>. We're doing things to it. Cut to the chase already.</p>
+     <p>A well-designed API might allow you to <a href="http://en.wikipedia.org/wiki/Method_chaining">chain methods</a> by returning the target in each method. Something like this:</p>
+     <pre><code class="language-java">class Foo {
 	Foo doBar() {
 		System.out.println(
-			&quot;doing bar&quot;);
+			"doing bar");
 		return this;
 	}
 
 	Foo doBaz(final String anArgument) {
 		System.out.println(
-			&quot;doing baz with &quot; + anArgument);
+			"doing baz with " + anArgument);
 		return this;
 	}
 }
 
 Foo foo = new Foo()
 		.doBar()
-		.doBaz();</code></pre><p>But then, there are still a couple of API flies in the ointment:</p><ol><li>You run into issues with inheritance because child classes get upcast to their parents when chaining <em>and</em></li><li>Some <a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/package-summary.html">poorly designed libraries</a> don't have this sort of chaining baked in.</li></ol>So, what do we do? Well, over in Clojure (where they do Java better than Java does Java), they have the <a href="http://clojuredocs.org/clojure_core/clojure.core/doto"><code>doto</code></a> macro. This guy lets you invoke all the methods you want on some target. Looks something like this:<p /><pre><code class="language-clojure">(doto (Foo.)
+		.doBaz();</code></pre>
+     <p>But then, there are still a couple of API flies in the ointment:</p>
+     <ol>
+      <li>You run into issues with inheritance because child classes get upcast to their parents when chaining <em>and</em></li>
+      <li>Some <a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/package-summary.html">poorly designed libraries</a> don't have this sort of chaining baked in.</li>
+     </ol>So, what do we do? Well, over in Clojure (where they do Java better than Java does Java), they have the <a href="http://clojuredocs.org/clojure_core/clojure.core/doto"><code>doto</code></a> macro. This guy lets you invoke all the methods you want on some target. Looks something like this:
+     <p></p>
+     <pre><code class="language-clojure">(doto (Foo.)
   (.doBar)
-  (.doBaz &quot;an argument&quot;))</code></pre><p>Cool, right? </p><p>Now, without macros, Java's defs not gunna be as succinct. That said, I bet we can still do, well, <em>something</em>. Something like this, maybe:</p><pre><code class="language-java">Foo foo = doto(new Foo())
-		.invoke(&quot;bar&quot;)
-		.invoke(&quot;baz&quot;, &quot;an argument&quot;)
-		.andReturn();</code></pre><p>Now, how do we get there? Well, Java actually has some pretty slick reflection utilities. For example, you can grab a method pretty easily:</p><pre><code class="language-java">final Method doBaz = foo.getClass()
-				.getMethod(&quot;doBaz&quot;, String.class);</code></pre><p>Then, you can invoke that fella:</p><pre><code class="language-java">doBaz.invoke(foo, &quot;an argument&quot;);</code></pre><p>Pretty easy to see where we go from here. Let's create an <code>Invoker</code> class. This guy'll take some target and, with chained methods, let you invoke away to your heart's content. It'll also have an <code>andReturn</code> method which simply returns the target when you're done. Check it:</p><pre><code class="language-java">static class Invoker&lt;T&gt; {
+  (.doBaz "an argument"))</code></pre>
+     <p>Cool, right? </p>
+     <p>Now, without macros, Java's defs not gunna be as succinct. That said, I bet we can still do, well, <em>something</em>. Something like this, maybe:</p>
+     <pre><code class="language-java">Foo foo = doto(new Foo())
+		.invoke("bar")
+		.invoke("baz", "an argument")
+		.andReturn();</code></pre>
+     <p>Now, how do we get there? Well, Java actually has some pretty slick reflection utilities. For example, you can grab a method pretty easily:</p>
+     <pre><code class="language-java">final Method doBaz = foo.getClass()
+				.getMethod("doBaz", String.class);</code></pre>
+     <p>Then, you can invoke that fella:</p>
+     <pre><code class="language-java">doBaz.invoke(foo, "an argument");</code></pre>
+     <p>Pretty easy to see where we go from here. Let's create an <code>Invoker</code> class. This guy'll take some target and, with chained methods, let you invoke away to your heart's content. It'll also have an <code>andReturn</code> method which simply returns the target when you're done. Check it:</p>
+     <pre><code class="language-java">static class Invoker&lt;T&gt; {
 	final T target;
 
 	public Invoker(final T target) {
@@ -65,9 +105,22 @@ Foo foo = new Foo()
 	public T andReturn() {
 		return target;
 	}
-}</code></pre><p>Because this class is genericized, it'll correctly carry the target's type all the way through. Swag.</p><p>Now, we create a nice static constructor method to sweeten up the syntax a little:</p><pre><code class="language-java">public static &lt;T&gt; Invoker&lt;T&gt; doto(final T target) {
+}</code></pre>
+     <p>Because this class is genericized, it'll correctly carry the target's type all the way through. Swag.</p>
+     <p>Now, we create a nice static constructor method to sweeten up the syntax a little:</p>
+     <pre><code class="language-java">public static &lt;T&gt; Invoker&lt;T&gt; doto(final T target) {
 		return new Invoker&lt;T&gt;(target);
-	}</code></pre><p /><p>And we're all set:</p><pre><code class="language-java">Foo foo = doto(new Foo())
-		.invoke(&quot;bar&quot;)
-		.invoke(&quot;baz&quot;, &quot;an argument&quot;)
-		.andReturn();</code></pre><p>At the end of the day, what did we get? Well, we got method chaining, so hey, that's good. I mean, it's still noisier than the Clojure version, but, uh, at least we get the super unsafe string-based method invocation, so that's - yeesh. Okay, maybe you don't want to be using this any time soon. Still, it's neat that we can get there, at least.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
+	}</code></pre>
+     <p></p>
+     <p>And we're all set:</p>
+     <pre><code class="language-java">Foo foo = doto(new Foo())
+		.invoke("bar")
+		.invoke("baz", "an argument")
+		.andReturn();</code></pre>
+     <p>At the end of the day, what did we get? Well, we got method chaining, so hey, that's good. I mean, it's still noisier than the Clojure version, but, uh, at least we get the super unsafe string-based method invocation, so that's - yeesh. Okay, maybe you don't want to be using this any time soon. Still, it's neat that we can get there, at least.</p>
+    </div>
+    <script type="text/javascript">hljs.highlightAll();</script>
+   </div>
+  </div>
+ </body>
+</html>

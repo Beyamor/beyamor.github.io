@@ -1,12 +1,45 @@
-<html><head><meta charset="utf-8" /><title>The Sky Is No Place For Birds</title><link href="/css/shades-of-purple.min.css" rel="stylesheet" /><link href="/css/common.css" rel="stylesheet" /><link href="/css/blog.css" rel="stylesheet" /><script src="/js/highlight.min.js" type="text/javascript"></script></head><body><div id="header"><h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a></div><div id="content"><div id="blog"><h1 class="title">The Sky Is No Place For Birds</h1><span class="date">Jul 19, 2011</span><div id="content"><html><head></head><body><p>I'm playing around with the favicon. It's, it's pretty dumb. Not my favicon - that's too inconsequential a thing to merit <em>dumb</em> - but the word. <em>Favicon</em>. Portmanteaus, despite the synthesis of their nature, live in a very binary world. Either brilliant or <em>guesstimate</em>, there is no in between.</p><p>Did you notice the new italics tag? Yeah, let's go over that for a second.</p><pre><code>// yeah, we're doing some more regex up in here
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>The Sky Is No Place For Birds</title>
+  <link href="/css/shades-of-purple.min.css" rel="stylesheet">
+  <link href="/css/common.css" rel="stylesheet">
+  <link href="/css/blog.css" rel="stylesheet">
+  <script src="/js/highlight.min.js" type="text/javascript"></script>
+ </head>
+ <body>
+  <div id="header">
+   <h1><a href="/">Words in the Sky</a></h1><a href="/blog">Blog</a>
+  </div>
+  <div id="content">
+   <div id="blog">
+    <h1 class="title">The Sky Is No Place For Birds</h1><span class="date">Jul 19, 2011</span>
+    <div id="content">
+     <p>I'm playing around with the favicon. It's, it's pretty dumb. Not my favicon - that's too inconsequential a thing to merit <em>dumb</em> - but the word. <em>Favicon</em>. Portmanteaus, despite the synthesis of their nature, live in a very binary world. Either brilliant or <em>guesstimate</em>, there is no in between.</p>
+     <p>Did you notice the new italics tag? Yeah, let's go over that for a second.</p>
+     <pre><code>// yeah, we're doing some more regex up in here
 // this guy matches a very simple [**i]italic stuff[**/i] pattern
 /\[i\](.*?)\[\/i\]/s
 
 // that's thrown in a preg_replace_callback call that sticks
 // the matched group (.*) in an italicized span
-return '&lt;span style=&quot;font-style:italic&quot;&gt;$matches[1]&lt;/span&gt;';
+return '&lt;span style="font-style:italic"&gt;$matches[1]&lt;/span&gt;';
 
 // horribly mundane, but any excuse for the code tag
-// ah, right, still highlights commented keywords. lolz</code></pre><p>More restructuring on the back end. I'm a fan of feng shui, you see. The sort of feng shui <em>no one will ever see</em>.</p><p>I love this tag.</p><p>A bit of sprucing up with the CSS too. Mostly little changes, but I finally broke away from the ghastly underlined urls. Feels good bro. Honestly, there ain't a heck of a lot to brag about, but dang, it's a treat to put words on a page and have 'em show up all pretty like.</p><p>Oh, yeah, images. There's a thing. See, ideally, I'd get to a point where I can upload - or something - images and have them be associated with the blogs that link to them. That is, I'd like to have a means of linking to images which guarantees the links'll still work even if I decide I want to completely restructure the way the images themselves are stored. Well, hey, this sounds like a problem I've already solved. No, don't think too hard about it.</p><pre><code>// this beast tears the image name outta the url
+// ah, right, still highlights commented keywords. lolz</code></pre>
+     <p>More restructuring on the back end. I'm a fan of feng shui, you see. The sort of feng shui <em>no one will ever see</em>.</p>
+     <p>I love this tag.</p>
+     <p>A bit of sprucing up with the CSS too. Mostly little changes, but I finally broke away from the ghastly underlined urls. Feels good bro. Honestly, there ain't a heck of a lot to brag about, but dang, it's a treat to put words on a page and have 'em show up all pretty like.</p>
+     <p>Oh, yeah, images. There's a thing. See, ideally, I'd get to a point where I can upload - or something - images and have them be associated with the blogs that link to them. That is, I'd like to have a means of linking to images which guarantees the links'll still work even if I decide I want to completely restructure the way the images themselves are stored. Well, hey, this sounds like a problem I've already solved. No, don't think too hard about it.</p>
+     <pre><code>// this beast tears the image name outta the url
 // then stuffs it into a common directory
-RewriteRule ^entries/([0-9a-zA-Z\-_]+)/images/(.*)$ ./images/$2</code></pre><p>The obvious problem with the system above is that trying to force feed duplicate image names will cause it to swallow one forever. And the inevitable gargantuan folder full of images. But <em>details</em>. It'll tide us over until I get around to, say, making an actual unique image directory for each blog. Or hash the image names. Something. <em>Anything</em>.</p><p>Italics.</p><p>Also, <a href="http://www.wordsinthesky.com/blog/tags/">this</a>. It's a work in progress, but something I'd much like to see through to the end. Tag clouds are a right trip, insofar as visually representing categorization goes. But anyway. At some point, I'm going to have to really commit to a non-website project. Talking about the design of a site on that same site is hella meta, but let's face it, my dear imaginary reader, you and I both have better places to be.</p></body></html></div><script type="text/javascript">hljs.highlightAll();</script></div></div></body></html>
+RewriteRule ^entries/([0-9a-zA-Z\-_]+)/images/(.*)$ ./images/$2</code></pre>
+     <p>The obvious problem with the system above is that trying to force feed duplicate image names will cause it to swallow one forever. And the inevitable gargantuan folder full of images. But <em>details</em>. It'll tide us over until I get around to, say, making an actual unique image directory for each blog. Or hash the image names. Something. <em>Anything</em>.</p>
+     <p>Italics.</p>
+     <p>Also, <a href="http://www.wordsinthesky.com/blog/tags/">this</a>. It's a work in progress, but something I'd much like to see through to the end. Tag clouds are a right trip, insofar as visually representing categorization goes. But anyway. At some point, I'm going to have to really commit to a non-website project. Talking about the design of a site on that same site is hella meta, but let's face it, my dear imaginary reader, you and I both have better places to be.</p>
+    </div>
+    <script type="text/javascript">hljs.highlightAll();</script>
+   </div>
+  </div>
+ </body>
+</html>
