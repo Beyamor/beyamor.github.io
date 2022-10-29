@@ -13,7 +13,13 @@
   </div>
   <div id="content">
    <div id="blog">
-    <h1 class="title">Callback's A Drag</h1><span class="date">Sep 16, 2013</span>
+    <h1 class="title">Callback's A Drag</h1>
+    <div class="date">
+     Sep 16, 2013
+    </div>
+    <div class="tags">
+     <a class="tag" href="/blog/tags/clojure" title="Clojure">clojure</a><a class="tag" href="/blog/tags/code" title="Programming">code</a>
+    </div>
     <div id="content">
      <p>A few months ago, the Clojure/core team came out with <a href="http://clojure.com/blog/2013/06/28/clojure-core-async-channels.html">core.async</a>, a library designed to make asynchronous programming simpler. By making use of channels and smart syntax, the library provides a ladder out of callback hell. This is a particular godsend in world of browser programming where GUI events and AJAX requests make any program a labyrinthine mess. </p>
      <p>And while that all sounds great, it didn't mean much to me. It sounded neat, but I didn't get much of a sense of the value just by reading about it. To the end of understanding what core.async really brings to the table, I decided to play around with it a bit. Let's walk through a small app and see what the deal is.</p>

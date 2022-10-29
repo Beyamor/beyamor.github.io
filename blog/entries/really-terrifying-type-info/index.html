@@ -13,7 +13,13 @@
   </div>
   <div id="content">
    <div id="blog">
-    <h1 class="title">Really Terrifying Type Info</h1><span class="date">Jun 23, 2012</span>
+    <h1 class="title">Really Terrifying Type Info</h1>
+    <div class="date">
+     Jun 23, 2012
+    </div>
+    <div class="tags">
+     <a class="tag" href="/blog/tags/code" title="Programming">code</a><a class="tag" href="/blog/tags/cpp" title="C++">cpp</a>
+    </div>
     <div id="content">
      <p>Let's spend some time staring into the black abyss of metaprogramming in C++. Today, we're gunna cover variadic templates.</p>
      <p>A comrade in code, Nicolas Guillemot, is working on a <a href="https://github.com/nguillemot/viking">game engine</a> in C++ and reached a point where he was thinking about adding run time type information to his ```(https://github.com/nguillemot/viking/blob/master/purgatory/TestRTTI.cpp). There's this pattern where an RTTI information object is attached to each class, supplementing them with additional class data. This is useful because, for example, the RTTI objects can contain information about the class hierarchy, allowing for quick inheritance checks, which is the nature of the problem you and I are tackling today, my imaginary friend.</p>

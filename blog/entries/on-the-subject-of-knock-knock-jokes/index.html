@@ -13,7 +13,13 @@
   </div>
   <div id="content">
    <div id="blog">
-    <h1 class="title">On The Subject Of Knock-knock Jokes</h1><span class="date">Sep 21, 2011</span>
+    <h1 class="title">On The Subject Of Knock-knock Jokes</h1>
+    <div class="date">
+     Sep 21, 2011
+    </div>
+    <div class="tags">
+     <a class="tag" href="/blog/tags/code" title="Programming">code</a>
+    </div>
     <div id="content">
      <p>There are a few things I have to work out in life. Cooking with tofu. Growing a full beard. And, perhaps the most pressing, making abstractions which survive scrutiny - or, at least, don't <a href="http://www.joelonsoftware.com/articles/LeakyAbstractions.html">leak</a> so much that I find myself up to my knees in, uh, encapsulation fluid? Whatever it is abstraction leak.</p>
      <p>I approached the component-based architecture with a few goals in mind. We already discussed the big ones, my dear imaginary reader. Extensibility, low coupling, buzz words. However, I also set about with an objective much more specific to my homely little project. From the perspective of the factory, I wanted components to be homogenous. That is, the factory should require no knowledge about what makes one component different from another - they just need to know what pieces to put together and, in a perfect world, not what that means.</p>

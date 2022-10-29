@@ -13,7 +13,13 @@
   </div>
   <div id="content">
    <div id="blog">
-    <h1 class="title">A Splash Of Hash</h1><span class="date">Aug 17, 2012</span>
+    <h1 class="title">A Splash Of Hash</h1>
+    <div class="date">
+     Aug 17, 2012
+    </div>
+    <div class="tags">
+     <a class="tag" href="/blog/tags/clojure" title="Clojure">clojure</a><a class="tag" href="/blog/tags/code" title="Programming">code</a>
+    </div>
     <div id="content">
      <p>Hey yo hey. Clojure and crap.</p>
      <p>The always brilliant Nicolas Guillemot wrote this cool <a href="https://github.com/nguillemot/viking/blob/master/source/include/viking/HashString.hpp">compile time string hash thing</a> with C++0x11's <a href="http://en.wikipedia.org/wiki/C%2B%2B11#Generalized_constant_expressions">constexpr</a> keyword. It's pretty legit. If the string is known at compile time, it gets hashed at compile time. Alright. Let's get some Clojure code doing the same thing, just for fun.</p>
