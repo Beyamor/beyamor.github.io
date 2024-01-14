@@ -18,13 +18,11 @@ jobs:
         with:
           repository: "beyamor/wits"
           ref: "static-site"
-      #- name: build
-      #  run: lein build-site
-      #- name: upload
-      #  uses: actions/upload-pages-artifact@v3
-      #  with:
-      #    path: "target/site"
-      #- name: deploy
-      #  uses: actions/deploy-pages@v4
-      #- name: test
-      #  run: echo ${{steps.deployment.outputs.page_url}}
+      - name: build
+        run: lein build-site
+      - name: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "target/site"
+      - name: deploy
+        uses: actions/deploy-pages@v4
