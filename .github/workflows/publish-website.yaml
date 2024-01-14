@@ -9,6 +9,7 @@ jobs:
   build-site:
     runs-on: ubuntu-latest
     container: clojure:lein
+    environment: github-pages
     permissions:
       pages: write
       id-token: write
