@@ -1,0 +1,30 @@
+name: publish-website
+on:
+  push:
+    branches:
+      - master
+  #repository_dispatch:
+  #  types: [publish-website]
+jobs:
+  build-site:
+    runs-on: ubuntu-latest
+    container: clojure:lein
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "beyamor/wits"
+          ref: "static-site"
+      #- name: build
+      #  run: lein build-site
+      #- name: upload
+      #  uses: actions/upload-pages-artifact@v3
+      #  with:
+      #    path: "target/site"
+      #- name: deploy
+      #  uses: actions/deploy-pages@v4
+      #- name: test
+      #  run: echo ${{steps.deployment.outputs.page_url}}
